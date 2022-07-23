@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
-from .utils import to_camelcase, replace_chars
+from .utils import _to_camelcase, _replace_chars
 
-def get_soup_instance(html: str):
+def _get_soup_instance(html: str):
 	"""
 		Returns a BeautifulSoup given an html string
 		Arguments: 
@@ -11,7 +11,7 @@ def get_soup_instance(html: str):
 	"""
 	return BeautifulSoup(html, 'html.parser')
 
-def get_table_by_id(instance: BeautifulSoup, id: str):
+def _get_table_by_id(instance: BeautifulSoup, id: str):
 	"""
 		Finds an Table element by id
 		Arguments:
@@ -22,7 +22,7 @@ def get_table_by_id(instance: BeautifulSoup, id: str):
 	"""
 	return instance.find('table',id=id)
 
-def get_table_columns(table_instance: BeautifulSoup):
+def _get_table_columns(table_instance: BeautifulSoup):
 	"""
 		Extracts all the column names from an html table
 		Arguments:
@@ -32,10 +32,10 @@ def get_table_columns(table_instance: BeautifulSoup):
 	"""
 	header_node = table_instance.find('thead')
 	properties_nodes = (header_node.find('tr').select('th'))
-	properties_strings = list(map(lambda node: replace_chars(to_camelcase(node.text)), properties_nodes))
+	properties_strings = list(map(lambda node: _replace_chars(_to_camelcase(node.text)), properties_nodes))
 	return properties_strings
 
-def get_table_content(table_instance: BeautifulSoup):
+def _get_table_content(table_instance: BeautifulSoup):
 	"""
 		Returns all table rows
 		Arguments:
@@ -45,7 +45,7 @@ def get_table_content(table_instance: BeautifulSoup):
 	"""
 	return table_instance.find('tbody').select('tr')
 
-def generic_row_parser(row: BeautifulSoup, column_parser):
+def _generic_row_parser(row: BeautifulSoup, column_parser):
 	"""
 		Function that parses all the content of each row
 		Arguments:

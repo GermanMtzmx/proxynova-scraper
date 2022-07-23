@@ -1,13 +1,15 @@
 import asyncio
+from bs4 import BeautifulSoup
 import unidecode
 import traceback
 from pyppeteer import launch
-from .scrapper import *
-from .utils import replace_chars
+from .scrapper import _generic_row_parser, _get_soup_instance, _get_table_by_id, _get_table_columns, _get_table_content
+from .utils import _replace_chars
 
 PROXY_TABLE_ID = "tbl_proxy_list"
 PROXY_PROVIDER_BASE_URL = "https://www.proxynova.com"
 LATEST_PROXIES = "proxy-server-list"
+
 
 def _extract_ip(column: BeautifulSoup):
     """
@@ -40,11 +42,11 @@ def _proxy_row_parser(column: BeautifulSoup, index: int):
     elif index == 2:
         return column.find('time').get('datetime')
     elif index == 3:
-        return int(replace_chars(str(column.text)).replace('ms',''))
+        return int(_replace_chars(str(column.text)).replace('ms', ''))
     elif index == 5:
         return " ".join(str(column.text).split())
     else:
-        return replace_chars(str(column.text))
+        return _replace_chars(str(column.text))
 
 
 def _extract_proxies(table: BeautifulSoup):
@@ -55,17 +57,18 @@ def _extract_proxies(table: BeautifulSoup):
         Returns:
             An array containing each table row transformed into a python dictionary
     """
-    columns = get_table_columns(table)
-    table_content = get_table_content(table)
+    columns = _get_table_columns(table)
+    table_content = _get_table_content(table)
     proxies = []
     for row in table_content:
-        parsed_info = generic_row_parser(row, _proxy_row_parser)
+        parsed_info = _generic_row_parser(row, _proxy_row_parser)
         if len(parsed_info) > 1:
             parsed_content = dict(zip(columns, parsed_info))
             proxies.append(parsed_content)
     return proxies
 
-async def _get_page_content(url:str):
+
+async def _get_page_content(url: str):
     """
         Function used to get the html from a webpage
         Arguments:
@@ -86,6 +89,7 @@ async def _get_page_content(url:str):
         await page.close()
         await browser.close()
 
+
 def _get_proxies(country_code: str = None):
     """
         Common method to scrap the proxy table by country or all proxies availables (mixed countries)
@@ -96,13 +100,15 @@ def _get_proxies(country_code: str = None):
     """
     url: str
     if country_code is None:
-        url = "{}/{}/".format(PROXY_PROVIDER_BASE_URL,LATEST_PROXIES)
+        url = "{}/{}/".format(PROXY_PROVIDER_BASE_URL, LATEST_PROXIES)
     else:
-        url = "{}/{}/country-{}".format(PROXY_PROVIDER_BASE_URL, LATEST_PROXIES, country_code)
-    loop = asyncio.get_event_loop() 
+        url = "{}/{}/country-{}".format(PROXY_PROVIDER_BASE_URL,
+                                        LATEST_PROXIES, country_code)
+    loop = asyncio.get_event_loop()
     content = loop.run_until_complete(_get_page_content(url))
-    table = get_table_by_id(get_soup_instance(content), PROXY_TABLE_ID)
+    table = _get_table_by_id(_get_soup_instance(content), PROXY_TABLE_ID)
     return _extract_proxies(table)
+
 
 def get_proxies():
     """
@@ -111,6 +117,7 @@ def get_proxies():
             An array of proxies
     """
     return _get_proxies()
+
 
 def get_proxies_by_country(country_code: str):
     """
@@ -121,4 +128,3 @@ def get_proxies_by_country(country_code: str):
             An array of proxies filtered by country
     """
     return _get_proxies(country_code)
-    
