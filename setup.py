@@ -1,8 +1,8 @@
 from setuptools import find_packages, setup
 setup(
-    name='proxynova_scrapper',
+    name='proxynova_scraper',
     packages=find_packages(),
-    version='0.2',
+    version='0.1',
     description='Package to get proxies from proxynova.com via web scraping',
     author='German Martinez Solis',
     author_email='german.mtz.solis@gmail.com',
