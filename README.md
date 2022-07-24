@@ -16,7 +16,7 @@ pip install proxynova-scrapper
 You have two ways to get the proxies:
 
 - Get the latest ones
-- Get proxies by countries
+- Get proxies by country
 
 **Get the latest ones from different countries**
 
