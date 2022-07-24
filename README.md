@@ -8,7 +8,7 @@ Get free proxies for your projects from [proxinova.com](https://proxinova.com)
 **Installing the package**
 
 ```text
-pip install proxynova_scraper
+pip install proxynova-scrapper
 ```
 
 **Use**
